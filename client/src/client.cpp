@@ -12,7 +12,7 @@ int main(int argc, char** argv) {
     tc::Error error = tc::InferenceServerGrpcClient::Create(&client, server_url);
 
     if (!error.IsOk()) {
-        std::cerr << "Error with creating Trition client: " << error << std::endl;
+        std::cerr << "Error with creating Triton client: " << error << std::endl;
 	return 1;
     }
 
