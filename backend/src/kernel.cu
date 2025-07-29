@@ -8,7 +8,6 @@ __global__ void kernel(const float* input, float* output, int size) {
     }
 }
 
-# called in backend.cpp
 extern "C" void launch_kernel(const float* input, float* output, size_t size) {
     int blockSize = 256;
     int gridSize = (size + blockSize - 1) / blockSize;    
@@ -27,6 +26,5 @@ extern "C" void launch_kernel(const float* input, float* output, size_t size) {
     cudaMemcpy(output, d_out, bytes, cudaMemcpyDeviceToHost);
 
     cudaFree(d_in);
-    cudaFree(d_out); 
-     
+    cudaFree(d_out);      
 }
