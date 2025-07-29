@@ -13,20 +13,20 @@ extern "C" void launch_kernel(const float* input, float* output, size_t size) {
     int blockSize = 256;
     int gridSize = (size + blockSize - 1) / blockSize;    
 
-    float* deviceInput = nullptr;
-    float * deviceOutput = nullptr;
+    float* d_in = nullptr;
+    float* d_out = nullptr;
     size_t bytes = size * sizeof(float);
 
-    cudaMalloc((void**)&deviceInput, bytes);
-    cudaMalloc((void**)&deviceOutput, bytes);
+    cudaMalloc((void**)&d_in, bytes);
+    cudaMalloc((void**)&d_out, bytes);
 
-    cudaMemcpy(deviceInput, input, bytes, cudaMemcpyHostToDevice);
+    cudaMemcpy(d_in, input, bytes, cudaMemcpyHostToDevice);
 
-    kernel<<<gridSize,blockSize>>>(deviceInput, deviceOutput, size);
+    kernel<<<gridSize,blockSize>>>(d_in, d_out, size);
 
-    cudaMemcpy(output, deviceOutput, bytes, cudaMemcpyDeviceToHost);
+    cudaMemcpy(output, d_out, bytes, cudaMemcpyDeviceToHost);
 
-    cudaFree(deviceInput);
-    cudaFree(deviceOutput); 
+    cudaFree(d_in);
+    cudaFree(d_out); 
      
 }
