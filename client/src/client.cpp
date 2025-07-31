@@ -20,7 +20,7 @@ int main(int argc, char** argv) {
     const std::string input_name = "INPUT0";
     const std::string output_name = "OUTPUT0";
     const std::string data_type = "FP32";
-    const float size = 16;
+    const size_t size = 16;
 
     tc::InferInput* input_tensor;
     tc::InferInput::Create(&input_tensor, input_name, shape, data_type);
@@ -38,22 +38,29 @@ int main(int argc, char** argv) {
 
 	
     tc::InferResult* result;
-    err = client->Infer(&result, {input_tensor}, {output_tensor});
-    if (!err.IsOk()) {
+    error = client->Infer(&result, {input_tensor}, {output_tensor});
+
+    if (!error.IsOk()) {
 	return 1;
     }
 
-    std::vector<float> output_data;
-    err = result->RawData(output_name, (const uint8_t**)&output_data, &output_byte_size);
-    if (!err.IsOk()) {
+    size_t output_bytes = 0;
+    const uint8_t* output_buffer = nullptr;
+    error = result->RawData(output_name, &output_buffer, &output_bytes);
+
+    if (!error.IsOk()) {
 	return 1;
     }
-
+    
+    std::cout << "Input data: ";
     for (const auto& val : input_data) { std::cout << val << " "; }
-
+    std::cout << std::endl;
+ 
+    std::cout << "Output data: ";
     for (size_t i = 0; i < output_byte_size / sizeof(float) ; ++i) {
 	std::cout << output_data[i] << " ";
     }
+    std::cout << std::endl;
 
     return 0;
 }
