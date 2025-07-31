@@ -57,8 +57,9 @@ int main(int argc, char** argv) {
     std::cout << std::endl;
  
     std::cout << "Output data: ";
-    for (size_t i = 0; i < output_byte_size / sizeof(float) ; ++i) {
-	std::cout << output_data[i] << " ";
+    const float* output_data_ptr = reinterpret_cast<const float*>(output_buffer);
+    for (size_t i = 0; i < output_bytes / sizeof(float) ; ++i) {
+	std::cout << output_data_ptr[i] << " ";
     }
     std::cout << std::endl;
 
