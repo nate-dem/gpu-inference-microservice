@@ -8,6 +8,7 @@ int main(int argc, char** argv) {
     const std::string server_url = "localhost:8001";
     const std::string model_name = "custom_model";
 
+    // client used to communicate with Triton server
     std::unique_ptr<tc::InferenceServerGrpcClient> client;
     tc::Error error = tc::InferenceServerGrpcClient::Create(&client, server_url);
 
@@ -16,6 +17,7 @@ int main(int argc, char** argv) {
 	return 1;
     }
 
+    // properties of input tensor (used to create output tensor)
     std::vector<int64_t> shape = {1, 16};
     const std::string input_name = "INPUT0";
     const std::string output_name = "OUTPUT0";
@@ -36,7 +38,7 @@ int main(int argc, char** argv) {
     tc::InferRequestedOutput* output_tensor;
     tc::InferRequestedOutput::Create(&output_tensor, output_name);
 
-	
+    // server will send request to backend which will then call the CUDA kernel	
     tc::InferResult* result;
     error = client->Infer(&result, {input_tensor}, {output_tensor});
 

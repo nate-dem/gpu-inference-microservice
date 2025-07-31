@@ -15,6 +15,7 @@ TRITONBACKEND_ModelInstanceExecute(TRITONBACKEND_ModelInstance* instance, TRITON
 	    return error;
 	}
 
+	// retrieve properties of input tensor to create output tensor with same properties
 	const int64_t* input_shape;
 	uint32_t input_dims_count;
 	TRITONSERVER_DataType input_data_type;
@@ -34,6 +35,7 @@ TRITONBACKEND_ModelInstanceExecute(TRITONBACKEND_ModelInstance* instance, TRITON
 	    return error;
 	}
 
+	// need pointer to access input data buffer on the CPU
 	const void* input_buffer;
 	uint32_t idx = 0;
 	TRITONSERVER_MemoryType memory_type = TRITONSERVER_MEMORY_CPU;
@@ -52,6 +54,7 @@ TRITONBACKEND_ModelInstanceExecute(TRITONBACKEND_ModelInstance* instance, TRITON
 	    return error;
 	}	
 
+	// creates response and output tensor then adds the tensor to the response	
 	TRITONBACKEND_Response* response;
 	TRITONBACKEND_ResponseNew(&response, request);
 	TRITONBACKEND_Output* output_tensor;
@@ -69,8 +72,8 @@ TRITONBACKEND_ModelInstanceExecute(TRITONBACKEND_ModelInstance* instance, TRITON
 	    return error;
 	}
 
+	// allocate memory buffer for output tensor which will be passed into CUDA kernel
 	void* output_buffer;
-
 	error = TRITONBACKEND_OutputBuffer(
 	    output_tensor,
 	    &output_buffer,
@@ -84,7 +87,6 @@ TRITONBACKEND_ModelInstanceExecute(TRITONBACKEND_ModelInstance* instance, TRITON
 	}
 
 	size_t num_elems = input_bytes / sizeof(float);
-
 	launch_kernel(
 	    static_cast<const float*>(input_buffer),
 	    static_cast<float*>(output_buffer),
