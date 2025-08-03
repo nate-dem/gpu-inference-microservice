@@ -17,7 +17,7 @@ target_include_directories(custom_backend PRIVATE
    ${TRITON_SERVER_DIR}/backends)
 
 target_link_libraries(custom_backend PRIVATE
-   CUDA:cudart
+   CUDA::cudart
    ${TRITON_SERVER_DIR}/lib/stubs/libtritonserver.so
 )
 
