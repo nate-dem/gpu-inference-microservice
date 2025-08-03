@@ -8,7 +8,3 @@ set(TRITON_CLIENT_DIR $ENV{TRITON_CLIENT_DIR})
 
 add_subdirectory(backend)
 add_subdirectory(client)
-
-target_link_libraries(custom_backend PRIVATE ${TRITON_SERVER_DIR}/lib/libtritonserver.so)
-target_link_libraries(triton_client PRIVATE ${TRITON_CLIENT_DIR}/lib/libtritongrpcclient.so)
-
