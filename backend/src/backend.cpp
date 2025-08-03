@@ -3,7 +3,7 @@
 
 extern "C" void launch_kernel(const float* input, float* output, int size);
 
-TRITONAPI TRITONSERVER_Error* TRITONBACKEND_ModelInstanceExecute(TRITONBACKEND_ModelInstance* instance, TRITONBACKEND_Request** requests, const uint32_t request_count) {
+TRITONSERVER_Error* TRITONBACKEND_ModelInstanceExecute(TRITONBACKEND_ModelInstance* instance, TRITONBACKEND_Request** requests, const uint32_t request_count) {
     for (uint32_t r = 0; r < request_count; ++r) {
         TRITONBACKEND_Request* request = requests[r];
         
@@ -99,37 +99,37 @@ TRITONAPI TRITONSERVER_Error* TRITONBACKEND_ModelInstanceExecute(TRITONBACKEND_M
 }
 
 // lifestyle functions for Triton
-TRITONAPI TRITONSERVER_Error*
+TRITONSERVER_Error*
 TRITONBACKEND_Initialize(TRITONBACKEND_Backend* backend) {
     std::cout << "Custom backend initialized." << std::endl;
     return nullptr;
 }
 
-TRITONAPI TRITONSERVER_Error*
+TRITONSERVER_Error*
 TRITONBACKEND_Finalize(TRITONBACKEND_Backend* backend) {
     std::cout << "Custom backend finalized." << std::endl;
     return nullptr; 
 }
 
-TRITONAPI TRITONSERVER_Error*
+TRITONSERVER_Error*
 TRITONBACKEND_ModelInitialize(TRITONBACKEND_Model* model) {
     std::cout << "Custom model initialized." << std::endl;
     return nullptr; 
 }
 
-TRITONAPI TRITONSERVER_Error*
+TRITONSERVER_Error*
 TRITONBACKEND_ModelFinalize(TRITONBACKEND_Model* model) {
     std::cout << "Custom model finalized." << std::endl;
     return nullptr; 
 }
 
-TRITONAPI TRITONSERVER_Error*
+TRITONSERVER_Error*
 TRITONBACKEND_ModelInstanceInitialize(TRITONBACKEND_ModelInstance* instance) {
     std::cout << "Custom model instance initialized." << std::endl;
     return nullptr; 
 }
 
-TRITONAPI TRITONSERVER_Error*
+TRITONSERVER_Error*
 TRITONBACKEND_ModelInstanceFinalize(TRITONBACKEND_ModelInstance* instance) {
     std::cout << "Custom model instance finalized." << std::endl;
     return nullptr;
