@@ -1,15 +1,14 @@
-# min version of CMake needed
+# min version of CMake needed and main project
 cmake_minimum_required(VERSION 3.18)
+project(gpu_inference_microservice LANGUAGES CXX CUDA)
 
-# main project
-project(gpu_inference_microservice)
+set(CMAKE_CXX_STANDARD 17)
+set(TRITON_SERVER_DIR $ENV{TRITON_SERVER_DIR})
+set(TRITON_CLIENT_DIR $ENV{TRITON_CLIENT_DIR})
 
-set(Triton_DIR "/opt/tritonserver/lib/cmake/Triton")
-find_package(Triton REQUIRED)
-
-# subdirectories that contain other CMakeLists.txt files
 add_subdirectory(backend)
 add_subdirectory(client)
 
-target_link_libraries(custom_backend PRIVATE Triton::tritonbackend)
-target_link_libraries(triton_client PRIVATE Triton::grpcclient)
+target_link_libraries(custom_backend PRIVATE ${TRITON_SERVER_DIR}/lib/libtritonserver.so)
+target_link_libraries(triton_client PRIVATE ${TRITON_CLIENT_DIR}/lib/libtritongrpcclient.so)
+
