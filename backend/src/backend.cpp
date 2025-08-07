@@ -1,11 +1,12 @@
 #include <iostream>
+#include <cuda_runtime.h>
 #include "triton/core/tritonbackend.h"
 
-extern "C" void launch_kernel(const float* input, float* output, int size);
+extern "C" void launch_kernel(const float* input, float* output, int size, cudaStream_t stream);
 
 TRITONSERVER_Error* TRITONBACKEND_ModelInstanceExecute(TRITONBACKEND_ModelInstance* instance, TRITONBACKEND_Request** requests, const uint32_t request_count) {
     cudaStream_t stream;
-    TRITONSERVER_ERROR* error = TRITONBACKEND_ModelInstanceCudaStream(instance, reinterpret_cast<void**>(&stream);
+    TRITONSERVER_Error* error = TRITONBACKEND_ModelInstanceCudaStream(instance, reinterpret_cast<void**>(&stream));
 
     if (error != nullptr) {
    	return error;
@@ -76,10 +77,6 @@ TRITONSERVER_Error* TRITONBACKEND_ModelInstanceExecute(TRITONBACKEND_ModelInstan
 	    is_alloc = true;
 	}
 
-	if (error != nullptr) {
-	    return error;
-        }
-
 	// creates response and output tensor then adds the tensor to the response	
 	TRITONBACKEND_Response* response;
 	TRITONBACKEND_ResponseNew(&response, request);
@@ -121,7 +118,12 @@ TRITONSERVER_Error* TRITONBACKEND_ModelInstanceExecute(TRITONBACKEND_ModelInstan
 	    static_cast<float*>(output_buffer),
 	    static_cast<int>(num_elems),
 	    stream
-	);	
+	);
+
+	if (is_alloc) {
+	    cudaFreeAsync(device_input, stream);
+        }
+	
 	TRITONBACKEND_ResponseSend(response, TRITONSERVER_RESPONSE_COMPLETE_FINAL, nullptr);
     	TRITONBACKEND_RequestRelease(request, TRITONSERVER_REQUEST_RELEASE_ALL);
     }
