@@ -15,6 +15,7 @@ endif()
 project(custom_backend LANGUAGES CXX CUDA)
 enable_language(CUDA)              # ensures nvcc is available
 
+find_package(CUDAToolkit REQUIRED)
 # ---------------------------------------------------------------------------
 # Include / link paths for Triton headers and shared libs
 # ---------------------------------------------------------------------------
@@ -37,6 +38,9 @@ set_target_properties(custom_backend PROPERTIES
    CXX_STANDARD 17
    POSITION_INDEPENDENT_CODE ON
    CUDA_SEPARABLE_COMPILATION ON)
+
+target_include_directories(custom_backend
+	PRIVATE ${CUDAToolkit_INCLUDE_DIRS})
 
 # Expose GPU helpers in tritonbackend.h
 target_compile_definitions(custom_backend
