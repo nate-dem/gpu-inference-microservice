@@ -1,3 +1,4 @@
+#define TRITON_ENABLE_GPU 1
 #include <iostream>
 #include <cuda_runtime.h>
 #include "triton/core/tritonbackend.h"
@@ -5,15 +6,10 @@
 extern "C" void launch_kernel(const float* input, float* output, int size, cudaStream_t stream);
 
 TRITONSERVER_Error* TRITONBACKEND_ModelInstanceExecute(TRITONBACKEND_ModelInstance* instance, TRITONBACKEND_Request** requests, const uint32_t request_count) {
-    cudaStream_t stream;
-    TRITONSERVER_Error* error = TRITONBACKEND_ModelInstanceCudaStream(instance, reinterpret_cast<void**>(&stream));
-
-    if (error != nullptr) {
-   	return error;
-    }
-    
-    int64_t device_id = 0;
-    error = TRITONBACKEND_ModelInstanceDeviceId(instance, &device_id);
+    cudaStream_t stream = 0;
+     
+    int32_t device_id = 0;
+    TRITONSERVER_Error* error = TRITONBACKEND_ModelInstanceDeviceId(instance, &device_id);
     
     if (error != nullptr) {
 	return error;
@@ -98,7 +94,7 @@ TRITONSERVER_Error* TRITONBACKEND_ModelInstanceExecute(TRITONBACKEND_ModelInstan
 	// allocate memory buffer for output tensor which will be passed into CUDA kernel
 	void* output_buffer;
 	TRITONSERVER_MemoryType output_memory_type = TRITONSERVER_MEMORY_GPU;
-	int64_t output_memory_id = device_id;
+	int64_t output_memory_id = static_cast<int64_t>(device_id);
 
 	error = TRITONBACKEND_OutputBuffer(
 	    output_tensor,
