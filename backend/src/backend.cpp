@@ -4,11 +4,25 @@
 extern "C" void launch_kernel(const float* input, float* output, int size);
 
 TRITONSERVER_Error* TRITONBACKEND_ModelInstanceExecute(TRITONBACKEND_ModelInstance* instance, TRITONBACKEND_Request** requests, const uint32_t request_count) {
+    cudaStream_t stream;
+    TRITONSERVER_ERROR* error = TRITONBACKEND_ModelInstanceCudaStream(instance, reinterpret_cast<void**>(&stream);
+
+    if (error != nullptr) {
+   	return error;
+    }
+    
+    int64_t device_id = 0;
+    error = TRITONBACKEND_ModelInstanceDeviceId(instance, &device_id);
+    
+    if (error != nullptr) {
+	return error;
+    }	
+
     for (uint32_t r = 0; r < request_count; ++r) {
         TRITONBACKEND_Request* request = requests[r];
         
 	TRITONBACKEND_Input* input_tensor;
-	TRITONSERVER_Error* error = TRITONBACKEND_RequestInputByIndex(request, 0, &input_tensor);
+	error = TRITONBACKEND_RequestInputByIndex(request, 0, &input_tensor);
 		
 	if (error != nullptr) {
 	    return error;
@@ -37,21 +51,34 @@ TRITONSERVER_Error* TRITONBACKEND_ModelInstanceExecute(TRITONBACKEND_ModelInstan
 	// need pointer to access input data buffer on the CPU
 	const void* input_buffer;
 	uint32_t idx = 0;
-	TRITONSERVER_MemoryType memory_type = TRITONSERVER_MEMORY_CPU;
-	int64_t memory_type_id = 0;
+	TRITONSERVER_MemoryType input_memory_type;
+	int64_t input_type_id;
 
 	error = TRITONBACKEND_InputBuffer(
 	    input_tensor, 
 	    idx, 
 	    &input_buffer, 
 	    &input_bytes, 
-	    &memory_type, 
-	    &memory_type_id
+	    &input_memory_type, 
+	    &input_type_id
 	);
 
 	if (error != nullptr) {
 	    return error;
-	}	
+	}
+
+	void* device_input = const_cast<void*>(input_buffer);
+	bool is_alloc = false;
+
+	if (input_memory_type != TRITONSERVER_MEMORY_GPU) {
+	    cudaMallocAsync(&device_input, input_bytes, stream);
+	    cudaMemcpyAsync(device_input, input_buffer, input_bytes, cudaMemcpyDefault, stream);
+	    is_alloc = true;
+	}
+
+	if (error != nullptr) {
+	    return error;
+        }
 
 	// creates response and output tensor then adds the tensor to the response	
 	TRITONBACKEND_Response* response;
@@ -73,12 +100,15 @@ TRITONSERVER_Error* TRITONBACKEND_ModelInstanceExecute(TRITONBACKEND_ModelInstan
 
 	// allocate memory buffer for output tensor which will be passed into CUDA kernel
 	void* output_buffer;
+	TRITONSERVER_MemoryType output_memory_type = TRITONSERVER_MEMORY_GPU;
+	int64_t output_memory_id = device_id;
+
 	error = TRITONBACKEND_OutputBuffer(
 	    output_tensor,
 	    &output_buffer,
 	    input_bytes,
-	    &memory_type,
-	    &memory_type_id
+	    &output_memory_type,
+	    &output_memory_id
 	);
 
 	if (error != nullptr) {
@@ -87,9 +117,10 @@ TRITONSERVER_Error* TRITONBACKEND_ModelInstanceExecute(TRITONBACKEND_ModelInstan
 
 	size_t num_elems = input_bytes / sizeof(float);
 	launch_kernel(
-	    static_cast<const float*>(input_buffer),
+	    static_cast<const float*>(device_input),
 	    static_cast<float*>(output_buffer),
-	    num_elems
+	    static_cast<int>(num_elems),
+	    stream
 	);	
 	TRITONBACKEND_ResponseSend(response, TRITONSERVER_RESPONSE_COMPLETE_FINAL, nullptr);
     	TRITONBACKEND_RequestRelease(request, TRITONSERVER_REQUEST_RELEASE_ALL);
