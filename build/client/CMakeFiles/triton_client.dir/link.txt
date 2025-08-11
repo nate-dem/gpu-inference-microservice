@@ -1,1 +1,0 @@
-/usr/bin/c++ CMakeFiles/triton_client.dir/src/client.cpp.o -o triton_client  -Wl,-rpath,/home/ubuntu/triton_clients/lib /home/ubuntu/triton_clients/lib/libgrpcclient.so /home/ubuntu/triton_clients/lib/libhttpclient.so -lpthread 

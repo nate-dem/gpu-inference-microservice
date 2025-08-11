@@ -1,8 +1,0 @@
-/home/ubuntu/gpu-inference-microservice/build/CMakeFiles/edit_cache.dir
-/home/ubuntu/gpu-inference-microservice/build/CMakeFiles/rebuild_cache.dir
-/home/ubuntu/gpu-inference-microservice/build/backend/CMakeFiles/custom_backend.dir
-/home/ubuntu/gpu-inference-microservice/build/backend/CMakeFiles/edit_cache.dir
-/home/ubuntu/gpu-inference-microservice/build/backend/CMakeFiles/rebuild_cache.dir
-/home/ubuntu/gpu-inference-microservice/build/client/CMakeFiles/triton_client.dir
-/home/ubuntu/gpu-inference-microservice/build/client/CMakeFiles/edit_cache.dir
-/home/ubuntu/gpu-inference-microservice/build/client/CMakeFiles/rebuild_cache.dir
