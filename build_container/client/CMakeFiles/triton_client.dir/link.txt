@@ -1,1 +1,0 @@
-/usr/bin/c++ CMakeFiles/triton_client.dir/src/client.cpp.o -o triton_client   -L/opt/tritonserver/lib  -Wl,-rpath,/opt/tritonserver/lib -ltritongrpcclient 
